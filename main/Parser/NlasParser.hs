@@ -1,52 +1,39 @@
------------------------------------------------------------------------------
---
--- Module      :  Parser.NLASParser
--- Copyright   :
--- License     :  BSD3
---
--- Maintainer  :  y_d_k@live.de
--- Stability   :
--- Portability :
---
--- |
---
------------------------------------------------------------------------------
-
 module Parser.NlasParser (
 fromText,
 fromUpEntries
 ) where
 
-import NlasExpression
+import Expression
 import qualified Parser.NlasPreParser as Pre
-import Unifier
-import ConstraintSet
-import Equations
-import UnificationProblem as UP
+import Constraint
+import Equation
 import Utilities.CustomUtilities
 import Debug.Trace
+import Permutation
+import PermutationInstances
 
 fromText = fromUpEntries . Pre.parse
+type EqsAndCons pi a = (Equations pi a, Constraints pi a)
 
-fromUpEntries :: [Pre.UpEntry] -> Either Failure (UnificationProblem String)
-fromUpEntries upEntries = foldM addToUp upEntries UP.emptyUp
+fromUpEntries :: [Pre.UpEntry] -> EqsAndCons (SwappingList String) String
+fromUpEntries = foldr addToUp ([], [])
 
-addToUp :: Pre.UpEntry -> UnificationProblem String -> Either Failure (UnificationProblem String)
-addToUp (Pre.Fresh a e) (Up gamma uni) = Right (Up gamma (addConToUnifier (toCon (Pre.Fresh a e)) uni))
-addToUp (Pre.Eq l r) up = UP.addEquation (toEq (Pre.Eq l r)) up
+addToUp c@(Pre.Fresh a e) (gamma, nabla) = (gamma, toCon c:nabla)
+addToUp eq@(Pre.Eq l r) (gamma, nabla) = (toEq eq:gamma, nabla)
 
-toCon (Pre.Fresh a e) = Con (toAt a) (toEx e)
+toCon (Pre.Fresh a e) = Fresh (toAt a) (toEx e)
 
-toAt (Pre.At a) = AtVar a
-toEq (Pre.Eq l r) = Eq (toEx l) (toEx r)
+toAt (Pre.At a) = AtVar (Name a)
+toEq (Pre.Eq l r) = eq (toEx l) (toEx r)
 
-toEx (Pre.Apply swap e) = Apply (toPerm swap) (toEx e)
-toEx (Pre.ExAtom a) = produceFromAtom (toAt a)
-toEx (Pre.ExVar (Pre.ExN s)) = ExpressionVar (ExVar s)
+toEx (Pre.Apply swap e) = addPerm (toPerm swap) (toEx e)
+toEx (Pre.ExAtom a) = fromAtVar (toAt a)
+toEx (Pre.ExVar (Pre.ExN s)) = fromExVar (ExVar (Name s))
 toEx (Pre.Lam bEx e) = Lam (toBEx bEx) (toEx e)
 toEx (Pre.Fn f args) = Fn f (map toEx args)
 
-toBEx (Pre.BExAtom a) = produceFromAtom (toAt a)
-toBEx (Pre.BaseApply swap bEx) = addPermutation (toPerm swap) (toBEx bEx)
+
+toBEx (Pre.BExAtom a) = (identity, toAt a)
+toBEx (Pre.BaseApply swap bEx) = let (pi, a) = toBEx bEx in (add (toPerm swap) pi, a)
 
 toPerm (Pre.Swap a b) = [(toAt a, toAt b)]
