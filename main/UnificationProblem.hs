@@ -9,6 +9,7 @@ import qualified Data.Map as Map
 
 data Gamma a = Gamma (LEquations a) (LMMSEquations a) deriving(Eq, Show)
 toList (Gamma eqs mmsEqs) = eqs ++ toEquations mmsEqs
+gammaFromList eqs = addManyToGamma eqs emptyGamma
 
 subToSuspension s (pi, s') (Gamma eqs mmsEqs) lContext
   = let (eqs', lContext') = subWithLabel s (ExpressionSuspension pi s') eqs lContext

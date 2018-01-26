@@ -20,13 +20,13 @@ flattenEx0 e s
   | otherwise = let (e', eqs, s') = flattenEx1 e (next s) in (e', [fromExVar s, e']:eqs, s')
 
 -- Iterate through expressions
-flattenExs0 es s = let (esF, eqs, s') = foldr g ([], [], s) es in (esF, eqs, s') --iteration reverses order of es
+flattenExs0 es s = let (esF, eqs, s') = foldr g ([], [], s) es in (esF, eqs, s') 
                     where
                       g e (es, eqs, s) = let (e', eqs', s') = flattenEx0 e s in (e':es, eqs ++ eqs', s')
 
 -- main flattening functions
 flattenExs :: PrePermutation pi => [Expression pi a] -> ExpressionVariable a -> ([Expression pi a], [[Expression pi a]], ExpressionVariable a)
-flattenExs es s = let (esF, eqs, s') = foldr g ([], [], s) es  in (esF, eqs, s') --iteration reverses order of es, b
+flattenExs es s = let (esF, eqs, s') = foldr g ([], [], s) es  in (esF, eqs, s')
                     where
                       g e (es, eqs, s) = let (e', eqs', s') = flattenEx1 e s in (e':es, eqs ++ eqs', s')
 

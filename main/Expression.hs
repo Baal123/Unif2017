@@ -30,12 +30,13 @@ data Expression pi a = AtomSuspension pi (AtomVariable a)
                        | Fn String [Expression pi a]
                        | Lam (pi, AtomVariable a) (Expression pi a)
                        deriving(Ord, Eq, Show)
+type Expressions pi a = [Expression pi a]
 
 instance Functor (Expression pi) where
   fmap f (AtomSuspension pi a) = AtomSuspension pi (fmap f a)
   fmap f (ExpressionSuspension pi s) = ExpressionSuspension pi (fmap f s)
   fmap f (Fn g es) = Fn g (map (fmap f) es)
-  fmap f (Lam (pi, a) e) = Lam (pi, fmap f a) (fmap f e) 
+  fmap f (Lam (pi, a) e) = Lam (pi, fmap f a) (fmap f e)
 
 instance Functor2 Expression where
   fmap2 f (AtomSuspension pi a) = AtomSuspension (f pi) a
@@ -94,6 +95,7 @@ addPerm perm (AtomSuspension perm' a) = AtomSuspension (add perm perm') a
 addPermToEs perm = map (addPerm perm)
 -- Labeled version with DAG
 type LExpression a = Expression Label a
+type LExpressions a = [LExpression a]
 
 addPermL l1 (AtomSuspension l2 a) dag = (AtomSuspension lN a, dagN)
                                         where
