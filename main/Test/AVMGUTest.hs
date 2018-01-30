@@ -17,13 +17,13 @@ import           MMSEquation
 import           ReductionRules
 import           AVMGU
 import           Data.List.Unique
-import           Control.Arrow((***))
+import           Control.Arrow((***), first)
 import           Decompression
 import qualified Data.Map as Map
 import           Data.Map((!))
-import           Debug.Trace
+import           Debug.NoTrace
 import           Utilities.TestVars
-import           PermutationInstances   
+import           PermutationInstances
 
 dag (LC x) = snd x
 
@@ -67,7 +67,7 @@ testMMS16 = uncurry avmgu up16 @?= Right (solution1, freshLContext)
 mmsTests1 = [testCase "testMMS1" testMMS11, testCase "testMMS1" testMMS12, testCase "testMMS1" testMMS13,
              testCase "testMMS1" testMMS14, testCase "testMMS1" testMMS15, testCase "testMMS1" testMMS16]
 
-testMMS2 = fmap (fOnFst (sortUniq *** sortUniq)) (uncurry avmgu up2) @?= Right (solution2, freshLContext)
+testMMS2 = fmap (first (sortUniq *** sortUniq)) (uncurry avmgu up2) @?= Right (solution2, freshLContext)
 
 decomNabla ((nabla, _), context) = let lMap = decomPermDag (dag context)
                                         in trace ("Decom nabla: " ++ show lMap) map (fmap2 (lMap !)) nabla

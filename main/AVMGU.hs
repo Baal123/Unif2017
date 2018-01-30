@@ -3,7 +3,7 @@ import           Constraint
 import           DAG
 import           Data.List
 import qualified Data.Map                  as Map
-import           Debug.Trace
+import           Debug.NoTrace
 import           Equation
 import           MMSEquation
 import           PermutationInstances

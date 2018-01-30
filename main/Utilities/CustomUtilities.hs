@@ -1,7 +1,7 @@
 module Utilities.CustomUtilities where
 import           Data.Either
 import           Data.Map    ((!))
-import           Debug.Trace
+import           Debug.NoTrace
 
 -- Failures
 --data Failure = FreshFail | SubFail | SolveFail | TooLarge | WrongEquationType | VarFail | Clash | CycleInCompoundEquations | UnexpectedFailure String deriving(Show, Eq, Ord)

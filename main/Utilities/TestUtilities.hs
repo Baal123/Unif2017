@@ -7,9 +7,6 @@ import           Equation
 import           UnificationContext
 import           Utilities.CustomUtilities
 
-fOnFst f (x, y) = (f x, y)
-fOnBoth f (x, y) = (f x, f y)
-
 exVar s = ExVar (Name s)
 atVar a = AtVar (Name a)
 

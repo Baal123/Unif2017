@@ -20,7 +20,7 @@ import           Utilities.CustomUtilities
 import           Permutation
 import           Utilities.EquationUtilities
 import           Substitution
-import Debug.Trace
+import Debug.NoTrace
 
 type LMMSEquationValue a = ([LExpression a], Int)
 

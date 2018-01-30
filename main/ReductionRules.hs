@@ -4,7 +4,7 @@ import           DAG
 import           Data.List
 import qualified Data.Map                  as Map
 import           Data.Maybe
-import           Debug.Trace
+import           Debug.NoTrace
 import           Equation
 import           Expression
 import           Flattening
