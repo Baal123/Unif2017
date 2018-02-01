@@ -1,26 +1,51 @@
 module Parser.NLASParser where
 import           Data.Char                     (isLower)
 import           Expression
+import           Constraint
 import           PermutationInstances
 import           Text.ParserCombinators.Parsec
+import           UnificationProblem
+import           UnificationContext
+import           Compression
 
-upFile :: GenParser Char st [[Expression (SwappingList String) String]]
-upFile = do result <- many line
-            eof
-            return result
+type Pi = SwappingList String
+data ConOrEq = E [Expression Pi String]
+               | C [Constraint Pi String]
+               deriving (Eq, Show, Ord)
 
-line = do result <- eq
-          eol
-          return result
+-- General
+simpleUpFromText text = fmap (\up -> simpleUp up ([], [])) (fromText text)
 
-eq = do first <- expression
-        rest <- remainigExpressions
-        return (first:rest)
+simpleUp [] up = up
+simpleUp (E eq:ls) (gamma, nabla) = simpleUp ls (eq:gamma, nabla)
+simpleUp (C c:ls) (gamma, nabla) = simpleUp ls (gamma, c:nabla)
 
-remainigExpressions = (char '=' >> eq) <|> return []
+fromText = parse up ""
+-- Parser
+up :: GenParser Char st [ConOrEq]
+up = do result <- line `sepBy` eol
+        eof
+        return result
+
+line = try conL <|> eqL
 
 eol = char '\n' <|> char ';'
 
+-- Constraints
+conL = do spaces
+          a <- atom
+          spaces
+          char '#'
+          es <- expression `sepBy` char ','
+          return (C (map (Fresh a) es))
+
+-- Equations
+eqL = do result <- eq
+         return (E result)
+
+eq = expression `sepBy` char '='
+
+-- Expressions
 expression = do spaces
                 result <- expression0
                 spaces
@@ -31,6 +56,7 @@ expression0 = lambdaEx <|>
               try suspension <|>
               braces expression
 
+-- All parsers from here on should neithe begin nor end with "spaces"
 funEx = do fn <- fnName
            args <- many expression
            return (Fn fn args)
@@ -49,7 +75,6 @@ suspension = do perm <- swappingList
                 return (if isLower . head $ n then AtomSuspension perm (AtVar (Name n))
                                               else ExpressionSuspension perm (ExVar (Name n)))
 
--- Parses an atom tuple
 atomTuple = do perm <- swappingList
                spaces
                a <- atom
@@ -81,4 +106,5 @@ fnName = do first <- char '$'
 lamSymb = char '\\'
 dotSymb = char '-' >> char '>'
 
+-- Help
 braces  = between (char '(') (char ')')
