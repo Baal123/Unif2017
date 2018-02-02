@@ -1,0 +1,20 @@
+Language to parse Nominal unification problems
+
+- Expressions have the form:
+  E := E | (E) | F E ... E | \\ pi A -> E | pi S | pi A
+  pi = <empty> | (A A) pi
+  A ~ Atom variable (starts with lower case letter)
+  S ~ Expression variable (starts with upper case letter)
+  F ~ Function symbol (starts with $)
+  Function is right associative, i.e.: $f1 $f2 A B C == $f1 ($f2 A B C)
+
+- Equations have the form:
+  Eq := E = Eq | <empty>  (Single expressions are allowed)
+
+- Constraints have the form:
+  C = A # Es
+  Es = E,Es | <empty> ("a#" is allowed, but disregarded)
+
+- Nominal unification problems have the form:
+  UP = E Sep UP | C Sep UP | <empty>
+  Sep = ; | \n
