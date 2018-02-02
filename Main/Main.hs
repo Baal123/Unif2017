@@ -1,4 +1,4 @@
-module UPIO where
+module Main where
 import Parser.NLASParser(fromText)
 import Text.ParserCombinators.Parsec(ParseError)
 import AVMGU
