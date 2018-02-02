@@ -21,9 +21,9 @@ freshPermDag :: PrePermutation pi => PermDAG pi
 freshPermDag = DAG [LabelTerm 0 identity] 1
 
 class Dag dag where
-  addComp :: Label -> Label -> dag pi -> (Label, dag pi)
-  addInv :: Label -> dag pi -> (Label, dag pi)
-  addTerm :: pi -> dag pi -> (Label, dag pi)
+  addComp :: PrePermutation pi => Label -> Label -> dag pi -> (Label, dag pi)
+  addInv :: PrePermutation pi => Label -> dag pi -> (Label, dag pi)
+  addTerm :: PrePermutation pi => pi -> dag pi -> (Label, dag pi)
 
 instance Dag PermDAG where
   addComp 0 l2 dag = (l2, dag)
@@ -31,4 +31,6 @@ instance Dag PermDAG where
   addComp l1 l2 (DAG ls nextL) = (nextL, DAG (Concat nextL l1 l2:ls) (nextL + 1))
   addInv 0 dag = (0, dag)
   addInv l1 (DAG ls nextL) = (nextL, DAG (Inverse nextL l1:ls) (nextL + 1))
-  addTerm pi1 (DAG ls nextL) = (nextL, DAG (LabelTerm nextL pi1:ls) (nextL + 1))
+  addTerm pi1 dag@(DAG ls nextL)
+    | pi1 == identity = (0, dag)
+    | otherwise = (nextL, DAG (LabelTerm nextL pi1:ls) (nextL + 1))

@@ -11,11 +11,6 @@ data Gamma a = Gamma (LEquations a) (LMMSEquations a) deriving(Eq, Show)
 toList (Gamma eqs mmsEqs) = eqs ++ toEquations mmsEqs
 gammaFromList eqs = addManyToGamma eqs emptyGamma
 
-subToSuspension s (pi, s') (Gamma eqs mmsEqs) lContext
-  = let (eqs', lContext') = subWithLabel s (ExpressionSuspension pi s') eqs lContext
-        (mmsEqs', lContext'') = subAndMerge s (pi, s') mmsEqs lContext'
-        in (Gamma eqs' mmsEqs', lContext'')
-
 type ExSubstitution pi a = (ExpressionVariable a, Expression pi a)
 type LExSubstitution a = ExSubstitution Label a
 type ExSubstitutions pi a = [ExSubstitution pi a]

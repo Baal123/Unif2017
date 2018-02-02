@@ -4,9 +4,9 @@ import           Permutation
 
 type SwappingList a = [(AtomVariable a, AtomVariable a)]
 
-instance PrePermutation [a] where
+instance Eq a => PrePermutation [a] where
   identity = []
 
-instance Permutation [a] where
+instance Eq a => Permutation [a] where
   inverse = reverse
   add = (++)

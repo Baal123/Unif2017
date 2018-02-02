@@ -22,7 +22,7 @@ avmgu (Gamma uEqs mmsEqs, nabla) lContext
         (mmsEqsFromU, otherEqs) = partition mmsEq (trace ("Partition UEqs result: " ++ show uEqs') uEqs')
         (mmsEqs', lContext1) = trace ("Add to MMS: " ++ show mmsEqsFromU) addEquations mmsEqsFromU mmsEqs lContext0
         in case otherEqs of
-           [] -> let (theta'', newEqs, oldEqs, lContext2) = workOnMMsEqs mmsEqs' theta' lContext1
+           [] -> let (theta'', newEqs, oldEqs, lContext2) = workOnMMsEqs (trace ("Work on MMS Eqs" ++ show mmsEqs') mmsEqs') theta' lContext1
                      (gamma', lContext3) = trace ("Eqs after MMS - (new, old): " ++ show (newEqs, toEquations oldEqs))
                                                  addManyToGamma newEqs (Gamma [] oldEqs) lContext2
                      in case newEqs of

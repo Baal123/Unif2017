@@ -37,24 +37,36 @@ exVarsOnRightSide2 eqs = concatMap (\(es, _) -> concatMap exVars es) (elems eqs)
 countS s eqs = length (filter (== s) (exVarsOnRightSide2 eqs))
 
 -- O(n)
-subAndMerge :: (Show a, Dag dag, Ord a) => ExpressionVariable a -> (Label, ExpressionVariable a) -> LMMSEquations a -> dag pi -> (LMMSEquations a, dag pi)
-subAndMerge s (pi, s') eqs lContext
+-- Martelli Montanari Style
+-- Remember Count of s in other equations
+
+subAndMerge :: (Show a, Dag dag, Ord a, PrePermutation pi) => ExpressionVariable a -> LExpression a -> LMMSEquations a -> dag pi
+               -> (LExpressions a, (LMMSEquations a, dag pi))
+subAndMerge s (ExpressionSuspension pi s') eqs lContext
   = let (ess, cs) = Map.findWithDefault ([], countS s eqs) s eqs
         (pi', lContext') = addInv pi lContext
         (vs, lContext'') = addPermToLes pi' ess lContext'
         eqs' = delete s eqs
         mEqs = adjust (mergeMMsValues (vs, cs)) s' eqs' -- eqs merged,
-        in subWithLabel s (ExpressionSuspension pi s') mEqs lContext''
+        in ([], subWithLabel s (ExpressionSuspension pi s') mEqs lContext'')
+
+subAndMerge s e@(AtomSuspension pi a) eqs lContext
+  = let (ess, cs) = Map.findWithDefault ([], countS s eqs) s eqs
+        (es, lContext') =  subWithLabel s e ess lContext
+        es' = e:es -- result of "s = ... [s -< pi a]"
+        ss = concatMap exVars es'
+        mEqs' = foldr (adjust (\(es, c) -> (es, c - 1))) (delete s eqs) ss -- O(log(n) * k), k <= maxArrity if flattened
+        in (es', subWithLabel s e mEqs' lContext')
 
 -- O(n log(n)), n == number of variables
-fromEquations :: (Ord a, Dag dag) => LEquations a -> dag pi -> (LMMSEquations a, dag pi)
+fromEquations :: (Ord a, Dag dag, PrePermutation pi) => LEquations a -> dag pi -> (LMMSEquations a, dag pi)
 fromEquations eqs lContext = let (eqs0, lContext') = mapWithContext movePermToRight eqs lContext -- O(n)
                                  mEqs = fromListWith mergeMMsValues $ map (\(ExpressionSuspension _ s, es, _) -> (s, (es, 0))) eqs0 -- O(n log(n))
                                  eqs'' = foldr (adjust incr) mEqs (exVarsOnRightSide1 eqs)  -- O(n log(n))
                                  in (eqs'', lContext')
 
 -- O(n)
-addEquation :: (Show a, Ord a, Dag dag) => LEquation a -> LMMSEquations a -> dag pi -> (LMMSEquations a, dag pi)
+addEquation :: (Show a, Ord a, Dag dag, PrePermutation pi) => LEquation a -> LMMSEquations a -> dag pi -> (LMMSEquations a, dag pi)
 addEquation eq eqs dag = let (eq', dag') = movePermToRight eq dag
                              (ExpressionSuspension _ s, es, _) = eq
                              eqs' = foldr (adjust incr) eqs (concatMap exVars es)

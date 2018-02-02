@@ -1,5 +1,5 @@
 module Permutation where
-class PrePermutation e where
+class Eq e => PrePermutation e where
   identity :: e
 
 class PrePermutation e => Permutation e where

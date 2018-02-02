@@ -33,13 +33,13 @@ firstGuess e1 = case eType e1 of
                         Fun f  -> FEq f
                         ExSusp -> ExEq
                         AtSusp -> AtEq
-eq e1 e2
-  | eType e1 /= ExSusp && eType e2 == ExSusp = eq e2 e1
-  | otherwise = let t1 = firstGuess e1
-                    in head $ addEx (e1, [], t1) e2
+
+eq0 e = (e, [], firstGuess e)
+eq e1 = addEx (eq0 e1)
 
 fromList :: [Expression pi a] -> [Equation pi a]
-fromList (e1:e2:es) = foldr (\e eqs -> concatMap (`addEx` e) eqs) [eq e1 e2] es
+fromList (e:es) = foldr (\e eqs -> concatMap (`addEx` e) eqs) [eq0 e] es
+fromList _ = []
 
 addEx (e, es, SymbolicEq) e' = [(e, e':es, SymbolicEq)]
 

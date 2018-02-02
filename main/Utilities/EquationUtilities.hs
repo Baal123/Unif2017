@@ -4,7 +4,7 @@ import           Equation
 import           Expression
 import           Permutation
 
-movePermToRight :: Dag dag => LEquation a -> dag pi -> (LEquation a, dag pi)
+movePermToRight :: (PrePermutation pi, Dag dag) => LEquation a -> dag pi -> (LEquation a, dag pi)
 movePermToRight (ExpressionSuspension pi s, es, t) lContext = let (pi', lContext0) = addInv pi lContext
                                                                   (es', lContext') = addPermToLes pi' es lContext0
                                                                   in ((ExpressionSuspension identity s, es', t), lContext')

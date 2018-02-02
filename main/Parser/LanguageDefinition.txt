@@ -6,6 +6,7 @@ Language to parse Nominal unification problems
   A ~ Atom variable (starts with lower case letter)
   S ~ Expression variable (starts with upper case letter)
   F ~ Function symbol (starts with $)
+  Function is right associative, i.e.: $f1 $f2 A B C == $f1 ($f2 A B C)
 
 - Equations have the form:
   Eq := E = Eq | <empty>  (Single expressions are allowed)

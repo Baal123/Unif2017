@@ -38,7 +38,7 @@ instance (Permutation pi, Eq a) => Substitutable (ExpressionVariable a) (Express
 
 -- Add labels
 class SubstitutableWithLabel v e c where
-  subWithLabel :: Dag dag => v -> e -> c -> dag pi -> (c, dag pi)
+  subWithLabel :: (Dag dag, PrePermutation pi) => v -> e -> c -> dag pi -> (c, dag pi)
 
 instance SubstitutableWithLabel v e c => SubstitutableWithLabel v e [c] where
   subWithLabel s e = mapWithContext (subWithLabel s e)

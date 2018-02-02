@@ -99,7 +99,7 @@ type LExpressions a = [LExpression a]
 
 addPermL l1 (AtomSuspension l2 a) dag = (AtomSuspension lN a, dagN)
                                         where
-                                          (lN, dagN) = addComp l1 l2 dagN
+                                          (lN, dagN) = addComp l1 l2 dag
 
 addPermL l1 (ExpressionSuspension l2 e) dag = (ExpressionSuspension lN e, dagN)
                                         where
