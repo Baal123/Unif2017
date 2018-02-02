@@ -1,7 +1,7 @@
 ﻿--Die Kommentare nicht kopieren!-
 --Ein Beispiel aus den Monadengesetzen
 --UPIO starten und als Unification Problem einfügen
---Zum Testen UPIO(main) ausführen und z.B. das unteren Unifikationsproblem eingeben
+--Zum Testen Main ausführen und z.B. das unteren Unifikationsproblem eingeben
 
 L1 = $>>= ($app ($return ) U) K;
 L2 = $>>= E $return;
