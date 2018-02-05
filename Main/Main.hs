@@ -1,16 +1,18 @@
 module Main where
-import Parser.NLASParser(fromText)
-import Text.ParserCombinators.Parsec(ParseError)
-import AVMGU
-import UnificationProblem
-import Flattening
-import Compression
-import UnificationContext
-import Equation(fromList)
-import PermutationInstances(SwappingList)
-import Data.Either
-import Utilities.CustomUtilities
-import Constraint
+import           AVMGU
+import           Compression
+import           Constraint
+import           Data.Either
+import           Display
+import           Equation                      (fromList)
+import           Flattening
+import           Parser.NLASParser             (fromText)
+import           PermutationInstances          (SwappingList)
+import           Text.ParserCombinators.Parsec (ParseError)
+import           UnificationContext
+import           UnificationProblem
+import           Utilities.CustomUtilities
+import           Data.Char
 
 main :: IO()
 main = do putStrLn "Enter Unification Problem - Press '.' to confirm"
@@ -20,50 +22,52 @@ main = do putStrLn "Enter Unification Problem - Press '.' to confirm"
                  else let up = pureUP parsed
                           in do putStrLn "Unification Problem read as:"
                                 printUP up
+                                printEmpty 2
+                                putStrLn "--------------"
+                                printEmpty 1
                                 printResult (uncurry avmgu up)
                                 end
 
 readUp = readUp0 []
 readUp0 ls = do l <- getLine
-                if last l == '.' then return (unlines (reverse ls))
+                if l /= "" && last l == '.' then return (unlines (reverse ls))
                 else readUp0 (l:ls)
 
-
-end = do putStrLn "Press any key to end"
-         getChar
-         putStrLn ""
+end = do printEmpty 1
+         putStrLn "Press r to repeat"
+         a <- getChar
+         if toUpper a == 'R' then main
+         else putStrLn ""
 
 printUP ((gamma, nabla), c) = do printEqs gamma
-                                 putStrLn ""
+                                 printEmpty 2
                                  printNabla nabla
-                                 putStrLn ""
+                                 printEmpty 2
                                  printContext c
 
 printResult (Left failure) = putStrLn ("Failue in AVMGU: " ++ show failure)
 printResult (Right ((nabla, theta), c)) = do putStrLn "AVMGU result is:"
                                              printTheta theta
+                                             printEmpty 2
                                              printNabla nabla
+                                             printEmpty 2
                                              printContext c
 
 printTheta theta = do putStrLn "Theta:"
-                      mapM_ (putStrLn . showSub) theta
+                      putStr (display theta)
 
 printEqs gamma = do putStrLn "Gamma is:"
-                    mapM_ (putStrLn . showEq) (toList gamma)
+                    putStr (display . toList $ gamma)
 
 printNabla nabla = do putStrLn "Nabla is:"
-                      mapM_ (putStrLn . showCon) nabla
+                      putStr (display nabla)
 
 printContext con = do putStrLn "Context is:"
-                      print con
+                      putStr (display con)
 
-showSub (s, e) = show s ++ "->" ++ show e
-showEq (e, es, t) = concatMapWith show (\l r -> l ++ " = " ++ r) (e:es)
-showCon (Fresh a e) = show a ++ "#" ++ show e
-showCon (FreshEq (pi1, a1) (pi2, a2)) = show pi1 ++ " " ++ show a1 ++ " =# " ++ show pi2 ++ " " ++ show a2
-showCon (CompFixFc pi1 pi2 s) = let s' = show s in show pi1 ++ " " ++ s' ++ " =# " ++ show pi2 ++ " " ++ s'
-
-concatMapWith f1 f2 ls = foldl1 f2 (map f1 ls)
+printEmpty 1 = putStrLn ""
+printEmpty n = do printEmpty (n-1)
+                  putStrLn ""
 
 pureUP :: Either ParseError (LUnificationProblem String, LUnifContext (SwappingList String))
         -> (LUnificationProblem String, LUnifContext (SwappingList String))
@@ -75,5 +79,8 @@ parseUP text = fmap (uncurry up) (fromText text)
 up eqs nabla = let (eqs0, c0) = compressEquations eqs freshLContext
                    (nablaL, c1) = compressConstraints nabla c0
                    (eqs1, c2) = flattenEqsC eqs0 c1
-                   (gamma, c3) = gammaFromList (concatMap fromList eqs1) c2 -- Bug in fromList
+                   (gamma, c3) = gammaFromList (filter (not . trivial) (concatMap fromList eqs1)) c2 -- Bug in fromList
                    in ((gamma, nablaL), c3)
+                where
+                  trivial (e, [], t) = True
+                  trivial _ = False

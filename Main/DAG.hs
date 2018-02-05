@@ -10,7 +10,17 @@ instance PrePermutation Label where
 data Node pi = LabelTerm Label pi
                | Inverse Label Label
                | Concat Label Label Label
-               deriving(Show, Eq, Ord)
+               deriving(Show, Eq)
+
+instance Ord pi => Ord (Node pi) where
+  compare (LabelTerm l1 pi1) (LabelTerm l2 pi2) = compare (l1, pi1) (l2, pi2)
+  compare LabelTerm{} _ = LT
+  compare (Inverse l1 l2) (Inverse l3 l4) = compare (l1, l2) (l3, l4)
+  compare Inverse{} Concat{} = LT
+  compare Inverse{} LabelTerm{} = GT
+  compare (Concat l1 l2 l3) (Concat l1' l2' l3') = compare (l1, l2, l3) (l1', l2', l3')
+  compare Concat{} _ = GT
+
 
 labelKey (LabelTerm l _) = l
 labelKey (Inverse l _) = l

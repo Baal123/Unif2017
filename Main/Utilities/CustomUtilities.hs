@@ -71,6 +71,7 @@ joinMonadList :: Monad m => [m a] -> m [a]
 joinMonadList []     = return []
 joinMonadList (e:es) = e >>= (\x -> (fmap (\ls -> x:ls) (joinMonadList es)))
 
+mergeOn _ _ [] = []
 mergeOn p f es  = foldl1 f toBeMerged : rest
                       where
                         (toBeMerged, rest) = decomp p es ([], [])
@@ -88,3 +89,7 @@ fromMaybeList (Nothing:xs) = fromMaybeList xs
 
 class Functor2 c where
   fmap2 :: (a -> b) -> c a d -> c b d
+
+-- concatMapWith concatWith mapTo
+concatMapWith _ _ [] = []
+concatMapWith concatWith mapTo ls = foldl1 concatWith (map mapTo ls)
