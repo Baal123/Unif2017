@@ -2,6 +2,7 @@ module Main where
 import           AVMGU
 import           Compression
 import           Constraint
+import           Data.Char
 import           Data.Either
 import           Display
 import           Equation                      (fromList)
@@ -12,7 +13,6 @@ import           Text.ParserCombinators.Parsec (ParseError)
 import           UnificationContext
 import           UnificationProblem
 import           Utilities.CustomUtilities
-import           Data.Char
 
 main :: IO()
 main = do putStrLn "Enter Unification Problem - Press '.' to confirm"
@@ -83,4 +83,4 @@ up eqs nabla = let (eqs0, c0) = compressEquations eqs freshLContext
                    in ((gamma, nablaL), c3)
                 where
                   trivial (e, [], t) = True
-                  trivial _ = False
+                  trivial _          = False

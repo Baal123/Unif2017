@@ -4,13 +4,13 @@ module Display where
 import           Constraint
 import           DAG
 import           Data.List
+import           Equation
 import           Expression
 import           Permutation
 import           PermutationInstances
 import           UnificationContext
 import           UnificationProblem
 import           Utilities.CustomUtilities
-import           Equation
 
 class Displayable c where
   display :: c -> String
@@ -39,11 +39,11 @@ instance Displayable a => Displayable (VariableName a) where
 
 instance Displayable a => Displayable (AtomVariable a) where
   display (AtVar n@(TmpName _)) = "_f" ++ display n
-  display (AtVar n@(Name _)) = display n
+  display (AtVar n@(Name _))    = display n
 
 instance Displayable a => Displayable (ExpressionVariable a) where
   display (ExVar n@(TmpName _)) = "_F" ++ display n
-  display (ExVar n@(Name _)) = display n
+  display (ExVar n@(Name _))    = display n
 
 instance Displayable Label where
   display = show
