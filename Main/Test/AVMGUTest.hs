@@ -16,7 +16,6 @@ import           UnificationProblem
 import           MMSEquation
 import           ReductionRules
 import           AVMGU
-import           Data.List.Unique
 import           Control.Arrow((***), first)
 import           Decompression
 import qualified Data.Map as Map

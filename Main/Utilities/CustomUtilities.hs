@@ -2,7 +2,7 @@ module Utilities.CustomUtilities where
 import           Data.Either
 import           Data.Map    ((!))
 import           Debug.NoTrace
-
+import           Data.List.Extra
 -- Failures
 --data Failure = FreshFail | SubFail | SolveFail | TooLarge | WrongEquationType | VarFail | Clash | CycleInCompoundEquations | UnexpectedFailure String deriving(Show, Eq, Ord)
 data Failure a = Fail a String deriving(Eq, Ord)
@@ -92,4 +92,7 @@ class Functor2 c where
 
 -- concatMapWith concatWith mapTo
 concatMapWith _ _ [] = []
-concatMapWith concatWith mapTo ls = foldl1 concatWith (map mapTo ls)
+concatMapWith concatWith mapTo ls = foldl1 concatWith . map mapTo $ ls
+
+sortUniq :: Ord a => [a] -> [a]
+sortUniq = sort . nubOrd
